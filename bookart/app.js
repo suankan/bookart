@@ -15,23 +15,8 @@ app.config(function($routeProvider) {
 		})
 });
 
-	app.controller('KartListCtrl', function($scope) {
-	$scope.kart = [];
-	$scope.buy = function(book) {
-		console.log("buy: ", book);
-	};
-
-});
-
-app.controller('HeaderCtrl', function ($scope) {
-	$scope.appDetails = {
-		title: "BooKart",
-		tagline: "We have 1 million books for you"
-	};
-});
-
-app.controller('BookListCtrl', function($scope) {
-	$scope.books = [
+app.factory("bookService", function() {
+	var books = [
 		{
 			imgUrl: "adultery.jpeg",
 			name: "Adultery",
@@ -94,7 +79,48 @@ app.controller('BookListCtrl', function($scope) {
 		}
 	];
 
-	$scope.addToKart = function(book){
-		console.log("add to kart:", book);
+	return {
+		getBooks: function() {
+			return books;
+		}
+	}
+})
+
+app.factory("kartService", function() {
+	var kart = [];
+	return {
+		getKart: function() {
+			return kart;
+		},
+		addToKart: function(book) {
+			kart.push(book)
+		},
+		buy: function(book) {
+			alert("Thanks for buying: ", book.name)
+		}
+	}
+});
+
+app.controller('HeaderCtrl', function ($scope) {
+	$scope.appDetails = {
+		title: "BooKart",
+		tagline: "We have 1 million books for you"
 	};
 });
+
+app.controller('BookListCtrl', function($scope, bookService, kartService) {
+	$scope.books = bookService.getBooks();
+
+	$scope.addToKart = function(book){
+		kartService.addToKart(book);
+	};
+});
+
+app.controller('KartListCtrl', function($scope, kartService) {
+	$scope.kart = kartService.getKart();
+	$scope.buy = function(book) {
+		kartService.buy(book);
+	};
+
+});
+
